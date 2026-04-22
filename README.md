@@ -61,13 +61,13 @@
 
 ### 方法一：直接開啟（最簡單）
 
-在 Finder 中找到 `cctv.html`，雙擊即可在預設瀏覽器開啟。
+在 Finder 中找到 `index.html`，雙擊即可在預設瀏覽器開啟。
 
 ### 方法二：使用 VS Code Live Server
 
 1. 以 VS Code 開啟專案資料夾
 2. 安裝 [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) 擴充功能
-3. 在 `cctv.html` 上按右鍵 → **Open with Live Server**
+3. 在 `index.html` 上按右鍵 → **Open with Live Server**
 
 ### 方法三：使用本機 HTTP 伺服器
 
@@ -76,7 +76,7 @@
 python3 -m http.server 8080
 
 # 開啟瀏覽器後訪問
-http://localhost:8080/cctv.html
+http://localhost:8080/index.html
 ```
 
 > **建議瀏覽器**：Chrome 或 Firefox 最新版本，以獲得最佳動畫效能與視覺效果。
@@ -87,7 +87,7 @@ http://localhost:8080/cctv.html
 
 ```
 UX Detective Agency/
-├── cctv.html       # 主組件頁面（含全部 CSS 與 JS）
+├── index.html       # 主組件頁面（含全部 CSS 與 JS）
 ├── images/         # 圖片資源目錄（保留供未來擴充）
 ├── .gitignore      # Git 忽略清單
 └── README.md       # 專案說明文件
