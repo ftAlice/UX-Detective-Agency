@@ -134,6 +134,7 @@ body::after{
 .scene{
   position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
   z-index:10;pointer-events:none;
+  perspective:1500px; /* Add 3D perspective */
 }
 
 /* ── MECHA CCTV ── */
@@ -160,6 +161,13 @@ body::after{
   clip-path:polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px);
   border:2px solid #FFFFFF;
   box-shadow:inset -10px -10px 20px rgba(0,0,0,0.15), inset 2px 2px 10px rgba(255,255,255,1);
+  transform-style:preserve-3d;
+}
+/* Fake 3D thickness block */
+.camera-body::before{
+  content:'';position:absolute;inset:0;background:#1A1C23;
+  clip-path:polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px);
+  transform:translateZ(-20px);z-index:-1;
 }
 
 /* Dark lower panel */
@@ -167,14 +175,16 @@ body::after{
   position:absolute;bottom:0;left:0;width:100%;height:35px;
   background:#1A1C23;
   clip-path:polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  transform:translateZ(2px);
 }
 
 /* Red accent lines */
 .accent-line{
   position:absolute;background:var(--red);
+  transform:skewX(-45deg) translateZ(4px);
 }
-.al-1{top:12px;left:30px;width:60px;height:4px;transform:skewX(-45deg);}
-.al-2{top:12px;left:100px;width:12px;height:4px;transform:skewX(-45deg);}
+.al-1{top:12px;left:30px;width:60px;height:4px;}
+.al-2{top:12px;left:100px;width:12px;height:4px;}
 
 /* Tech decals */
 .decal-main{
@@ -192,20 +202,30 @@ body::after{
 
 /* ── LENS HOUSING ── */
 .lens-housing{
-  position:absolute;left:-40px;top:50%;transform:translateY(-50%);
+  position:absolute;left:-40px;top:50%;
   width:110px;height:110px;
+  transform:translateY(-50%) translateZ(40px);
+  transform-style:preserve-3d;
 }
 .lens-rim{
   position:absolute;inset:0;border-radius:50%;
   background:#1A1C23;
   border:4px solid #EAECEF;
-  box-shadow:0 10px 30px rgba(0,0,0,0.6), inset 0 0 15px rgba(0,0,0,0.9);
+  box-shadow:0 15px 40px rgba(0,0,0,0.8), inset 0 0 15px rgba(0,0,0,0.9);
+  transform-style:preserve-3d;
 }
+/* Fake cylinder depth */
+.lens-rim::after{
+  content:'';position:absolute;inset:-4px;border-radius:50%;
+  background:#2A2D34;transform:translateZ(-15px);z-index:-1;
+}
+
 /* Angular cutouts on rim */
 .lens-rim::before{
   content:'';position:absolute;inset:-8px;border-radius:50%;
   border:2px dashed var(--red);opacity:0.5;
   animation:spin 20s linear infinite;
+  transform:translateZ(5px);
 }
 @keyframes spin{100%{transform:rotate(360deg)}}
 
@@ -214,16 +234,20 @@ body::after{
   background:radial-gradient(circle at 30% 30%, #2A2D34, #0B0C10 70%);
   box-shadow:inset 0 4px 10px rgba(0,0,0,0.8);
   overflow:hidden;
+  transform:translateZ(10px);
+  transform-style:preserve-3d;
 }
 
 .lens-iris{
   position:absolute;top:50%;left:50%;
-  width:60px;height:60px;transform:translate(-50%,-50%);
+  width:60px;height:60px;
   border-radius:50%;
   background:#050505;
   border:2px solid #2A2D34;
   display:flex;align-items:center;justify-content:center;
   transition:transform 0.15s cubic-bezier(0.2,0,0,1);
+  transform:translate(-50%,-50%) translateZ(10px);
+  transform-style:preserve-3d;
 }
 
 /* Cyber red glowing pupil */
@@ -232,6 +256,7 @@ body::after{
   background:var(--red);
   box-shadow:0 0 15px var(--red), 0 0 30px var(--red), inset 0 0 8px rgba(255,255,255,0.8);
   position:relative;
+  transform:translateZ(5px);
 }
 .lens-pupil::after{
   content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
@@ -417,19 +442,20 @@ glass.addEventListener('mouseleave',()=>{
 // Animation Loop
 function tick(){
   const nx=(mx/innerWidth-0.5)*2,ny=(my/innerHeight-0.5)*2;
-  const maxR=hov?18:12;
+  // Increase angle max to 70 degrees for extreme 3D rotation
+  const maxR=hov?75:65;
   trx=-ny*maxR;try_=nx*maxR;
   
   // Cyberpunk motion: Snappier, less organic delay
   const ease=hov?0.15:0.08;
   rx+=(trx-rx)*ease;ry+=(try_-ry)*ease;
 
-  // Wrapper 3D rotation
-  wrap.style.transform=`translate(-50%,-100px) rotateX(${rx*0.4}deg) rotateY(${ry}deg)`;
+  // Wrapper 3D rotation + MASSIVE SCALE (scale 2.5x to fill screen)
+  wrap.style.transform=`translate(-50%,-50%) scale(2.8) rotateX(${rx*0.6}deg) rotateY(${ry}deg)`;
 
-  // Iris internal translation (parallax)
-  const ipx=(ry/12)*8,ipy=(-rx/12)*8;
-  iris.style.transform=`translate(calc(-50% + ${ipx}px),calc(-50% + ${ipy}px))`;
+  // Iris internal translation (parallax deeper in Z space)
+  const ipx=(ry/12)*5,ipy=(-rx/12)*5;
+  iris.style.transform=`translate(calc(-50% + ${ipx}px),calc(-50% + ${ipy}px)) translateZ(15px)`;
 
   requestAnimationFrame(tick);
 }
@@ -438,10 +464,10 @@ tick();
 // Cyber Glitch Jitter
 function mechJitter(){
   if(Math.random()>0.7){
-    const jx=(Math.random()-0.5)*4;
-    wrap.style.transform=`translate(calc(-50% + ${jx}px),-100px) rotateX(${rx*0.4}deg) rotateY(${ry}deg)`;
+    const jx=(Math.random()-0.5)*8;
+    wrap.style.transform=`translate(calc(-50% + ${jx}px),-50%) scale(2.8) rotateX(${rx*0.6}deg) rotateY(${ry}deg)`;
     setTimeout(()=>{
-      wrap.style.transform=`translate(-50%,-100px) rotateX(${rx*0.4}deg) rotateY(${ry}deg)`;
+      wrap.style.transform=`translate(-50%,-50%) scale(2.8) rotateX(${rx*0.6}deg) rotateY(${ry}deg)`;
     }, 40);
   }
   setTimeout(mechJitter, 800+Math.random()*2000);
